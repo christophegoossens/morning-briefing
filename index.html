@@ -1,0 +1,577 @@
+<!DOCTYPE html><script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Morning Investment Briefing",
+  "schemaVersion": 1,
+  "description": "Daily morning investment briefing for Christophe — curated short and long-term picks available on Bolero Belgium, with day-by-day history navigation. Updated each morning by the scheduled task."
+}
+</script>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Morning Investment Briefing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink:       #0d1117;
+      --ink-2:     #1f2937;
+      --ink-3:     #374151;
+      --muted:     #6b7280;
+      --faint:     #9ca3af;
+      --border:    #e5e7eb;
+      --border-2:  #f3f4f6;
+      --bg:        #f9fafb;
+      --surface:   #ffffff;
+      --sky:       #0284c7;
+      --sky-dark:  #0369a1;
+      --sky-light: #e0f2fe;
+      --sky-mid:   #bae6fd;
+      --emerald:        #059669;
+      --emerald-light:  #d1fae5;
+      --emerald-mid:    #6ee7b7;
+      --amber:          #d97706;
+      --amber-light:    #fef3c7;
+      --amber-mid:      #fcd34d;
+      --rose:           #e11d48;
+      --rose-light:     #ffe4e6;
+      --violet:         #7c3aed;
+      --violet-light:   #ede9fe;
+      --violet-mid:     #c4b5fd;
+      --r: 12px;
+      --r-sm: 8px;
+      --r-lg: 16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ─── TOPBAR ──────────────────────────────────────────────── */
+    .topbar {
+      height: 3px;
+      background: linear-gradient(90deg, #0284c7 0%, #7c3aed 50%, #059669 100%);
+    }
+
+    /* ─── HEADER ──────────────────────────────────────────────── */
+    .header {
+      background: var(--ink);
+      padding: 0 28px;
+      position: sticky; top: 0; z-index: 200;
+    }
+    .header-inner {
+      max-width: 960px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 18px 0 0;
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand-mark {
+      width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--sky) 0%, var(--violet) 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .brand-text {}
+    .brand-name {
+      font-size: 15px; font-weight: 800; color: #fff;
+      letter-spacing: -0.4px; line-height: 1.2;
+    }
+    .brand-sub {
+      font-size: 10px; font-weight: 500; letter-spacing: 1.2px;
+      text-transform: uppercase; color: rgba(255,255,255,0.35);
+      margin-top: 1px;
+    }
+    .header-meta { text-align: right; }
+    .header-date {
+      font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5);
+      letter-spacing: 0.3px;
+    }
+    .mood-tag {
+      display: inline-block; margin-top: 4px;
+      font-size: 11px; font-weight: 600; color: #6ee7b7;
+      background: rgba(16,185,129,0.12);
+      border: 1px solid rgba(110,231,183,0.25);
+      border-radius: 20px; padding: 2px 10px;
+      max-width: 220px; text-align: right;
+    }
+
+    /* ─── DATE NAV ────────────────────────────────────────────── */
+    .date-strip {
+      max-width: 960px; margin: 0 auto;
+      display: flex; gap: 2px;
+      overflow-x: auto; scrollbar-width: none;
+      padding-top: 12px;
+    }
+    .date-strip::-webkit-scrollbar { display: none; }
+    .dtab {
+      flex-shrink: 0; cursor: pointer; user-select: none;
+      padding: 8px 14px; border-radius: 8px 8px 0 0;
+      font-size: 12px; font-weight: 500;
+      color: rgba(255,255,255,0.35);
+      transition: background 0.12s, color 0.12s;
+      text-align: center; min-width: 72px;
+    }
+    .dtab:hover { color: rgba(255,255,255,0.65); background: rgba(255,255,255,0.06); }
+    .dtab.active { color: var(--ink); background: var(--bg); font-weight: 700; }
+    .dtab .wd {
+      display: block; font-size: 9px; letter-spacing: 0.8px;
+      text-transform: uppercase; opacity: 0.7; margin-bottom: 2px;
+    }
+
+    /* ─── PAGE BODY ───────────────────────────────────────────── */
+    .page { max-width: 960px; margin: 0 auto; padding: 28px 28px 60px; }
+
+    /* ─── SECTION ─────────────────────────────────────────────── */
+    .sec { margin-bottom: 32px; }
+    .sec-head {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+    }
+    .sec-icon {
+      width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+    }
+    .sec-icon.sky    { background: var(--sky-light);     }
+    .sec-icon.amber  { background: var(--amber-light);   }
+    .sec-icon.green  { background: var(--emerald-light); }
+    .sec-icon.violet { background: var(--violet-light);  }
+    .sec-icon.rose   { background: var(--rose-light);    }
+    .sec-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--muted);
+    }
+    .sec-rule { flex: 1; height: 1px; background: var(--border); }
+
+    /* ─── MACRO ───────────────────────────────────────────────── */
+    .macro-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .macro-bar { height: 3px; background: linear-gradient(90deg, var(--sky) 0%, var(--sky-dark) 100%); }
+    .macro-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+    .macro-row { display: flex; gap: 12px; align-items: flex-start; }
+    .macro-bullet {
+      width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; margin-top: 1px;
+      background: var(--sky-light); border: 2px solid var(--sky-mid);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .macro-bullet svg { width: 8px; height: 8px; fill: var(--sky); }
+    .macro-text { font-size: 13.5px; color: var(--ink-2); line-height: 1.55; }
+
+    /* ─── STOCK GRID ──────────────────────────────────────────── */
+    .stock-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 680px) { .stock-grid { grid-template-columns: 1fr 1fr; } }
+
+    .stock-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      transition: box-shadow 0.18s, transform 0.18s;
+      display: flex; flex-direction: column;
+    }
+    .stock-card:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      transform: translateY(-1px);
+    }
+    .card-bar { height: 3px; }
+    .card-bar.st { background: linear-gradient(90deg, var(--amber), #fbbf24); }
+    .card-bar.lt { background: linear-gradient(90deg, var(--emerald), #34d399); }
+
+    .card-body { padding: 16px 18px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .card-ticker-wrap {}
+    .card-ticker {
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 20px; font-weight: 700; color: var(--ink);
+      letter-spacing: -0.5px; line-height: 1;
+    }
+    .card-company { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 500; }
+    .exch-chip {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.4px;
+      padding: 3px 9px; border-radius: 6px;
+      background: var(--bg); border: 1px solid var(--border);
+      color: var(--muted); white-space: nowrap; flex-shrink: 0;
+    }
+    .card-divider { height: 1px; background: var(--border-2); margin: 0 -18px; }
+    .card-fields { display: flex; flex-direction: column; gap: 8px; }
+    .card-field { display: flex; gap: 10px; }
+    .field-key {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.6px; flex-shrink: 0; padding-top: 2px; min-width: 48px;
+    }
+    .field-key.why   { color: var(--emerald); }
+    .field-key.entry { color: var(--sky);     }
+    .field-key.risk  { color: var(--rose);    }
+    .field-val { font-size: 12.5px; color: var(--ink-3); line-height: 1.55; }
+
+    /* ─── ETF CARD ────────────────────────────────────────────── */
+    .etf-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .etf-bar { height: 3px; background: linear-gradient(90deg, var(--violet), #a78bfa); }
+    .etf-body { padding: 18px 20px; }
+    .etf-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+    .etf-ticker-wrap {}
+    .etf-ticker {
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 24px; font-weight: 700; color: var(--violet);
+      letter-spacing: -0.5px; line-height: 1;
+    }
+    .etf-name { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 500; }
+    .etf-exch { font-size: 11px; color: var(--faint); margin-top: 2px; }
+    .horizon-chip {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.4px;
+      padding: 4px 12px; border-radius: 20px;
+      background: var(--violet-light); color: var(--violet);
+      border: 1px solid var(--violet-mid); white-space: nowrap; flex-shrink: 0;
+    }
+    .etf-divider { height: 1px; background: var(--border-2); margin: 0 0 14px; }
+    .etf-rationale { font-size: 13px; color: var(--ink-3); line-height: 1.65; }
+    .etf-also {
+      margin-top: 10px; padding: 10px 14px; border-radius: var(--r-sm);
+      background: var(--violet-light); border: 1px solid var(--violet-mid);
+      font-size: 12px; color: var(--violet); line-height: 1.5; font-style: italic;
+    }
+
+    /* ─── WATCH ───────────────────────────────────────────────── */
+    .watch-list { display: flex; flex-direction: column; gap: 10px; }
+    .watch-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 14px 16px;
+      display: flex; gap: 14px; align-items: flex-start;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .watch-num {
+      width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+      background: var(--amber-light); border: 1.5px solid var(--amber-mid);
+      color: var(--amber); font-size: 11px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; margin-top: 0px;
+    }
+    .watch-text { font-size: 13px; color: var(--ink-3); line-height: 1.55; }
+
+    /* ─── MOOD FOOTER ─────────────────────────────────────────── */
+    .mood-footer {
+      margin-top: 12px; padding: 16px 20px;
+      background: linear-gradient(135deg, #f0f9ff 0%, #f5f3ff 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      font-size: 13.5px; color: var(--ink-2);
+      text-align: center; line-height: 1.6;
+    }
+    .mood-footer strong { font-weight: 700; color: var(--ink); }
+
+    /* ─── DISCLAIMER ──────────────────────────────────────────── */
+    .disclaimer {
+      margin-top: 32px; text-align: center;
+      font-size: 11px; color: var(--faint); line-height: 1.7;
+      padding: 0 12px;
+    }
+
+    /* ─── EMPTY ───────────────────────────────────────────────── */
+    .empty { text-align: center; padding: 80px 20px; }
+    .empty .eicon { font-size: 48px; margin-bottom: 16px; }
+    .empty h2 { font-size: 20px; font-weight: 800; color: var(--ink); margin-bottom: 8px; }
+    .empty p { font-size: 13px; color: var(--muted); }
+
+    /* ─── RESPONSIVE ──────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .header { padding: 0 16px; }
+      .page { padding: 20px 16px 48px; }
+      .brand-name { font-size: 14px; }
+      .header-date { font-size: 11px; }
+      .mood-tag { font-size: 10px; max-width: 160px; }
+      .dtab { min-width: 64px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     LATEST_BRIEFING  —  replaced by the scheduled task each morning
+     ══════════════════════════════════════════════════════════════ -->
+<script>
+const LATEST_BRIEFING = {
+  date: "2026-07-20",
+  mood: "Cautiously bullish into a pivotal week — equities are grinding to fresh gains even as oil spikes on Iran/Hormuz risk, with the market's real verdict due Wednesday and Thursday when Alphabet, Tesla, Intel and IBM report",
+  macro: [
+    "US futures opened firm: S&P 500 +0.63%, Nasdaq +1.02%, Dow +0.23%, while the Russell 2000 slipped 0.42% — large caps leading small caps into earnings season.",
+    "Oil jumped over 2% as Brent crude hit $90.40/barrel on renewed US-Iran tensions; the US Treasury revoked its sanctions waiver on Iranian oil (transactions barred since July 17) and Yemeni forces declared a 'maritime embargo' against Saudi Arabia, putting Strait of Hormuz flows back in focus. The US Strategic Petroleum Reserve is at its lowest level since 1983, leaving little buffer against a further supply shock.",
+    "Gold is catching a safe-haven bid too, up to $4,027/oz, as investors hedge both the geopolitical risk and the Fed's rate path simultaneously.",
+    "This is the heart of Big Tech earnings season: Alphabet and Tesla report Wednesday, Intel and IBM Thursday. Analysts expect Alphabet's revenue growth above 20% with all eyes on AI capex commitments; Tesla is down ~22% from its peak on margin concerns; Intel has rallied over 160% YTD ahead of its print, raising the bar; IBM is still nursing last week's 25% single-session plunge on disappointing prelim results."
+  ],
+  shortTerm: [
+    {
+      ticker: "TTE",
+      name: "TotalEnergies SE",
+      exchange: "Euronext Paris",
+      whyNow: "A diversified European oil major that captures today's Brent spike to $90+ directly through upstream production, while downstream and LNG operations cushion the swings a pure driller wouldn't have. Straightforward way to trade the Hormuz risk premium from Bolero without single-well exposure.",
+      risk: "The entire thesis is a geopolitical risk premium — any de-escalation or ceasefire signal on Iran unwinds the oil spike (and this trade) as fast as it built."
+    },
+    {
+      ticker: "HO",
+      name: "Thales SA",
+      exchange: "Euronext Paris",
+      whyNow: "European defense and aerospace names carry a structural tailwind as the Iran conflict escalates and NATO members keep lifting defense budgets. Thales adds cybersecurity and avionics diversification on top of the pure defense trade.",
+      risk: "Defense stocks have already re-rated hard over the past two years — a lot of good news is priced in, and any de-escalation removes the newsflow tailwind, not the underlying earnings."
+    },
+    {
+      ticker: "NEM",
+      name: "Newmont Corporation",
+      exchange: "NYSE",
+      whyNow: "Gold at $4,027/oz and rising gives the world's largest gold miner direct operating leverage to the metal — miners typically outrun bullion in a sustained safe-haven rally, and this one's catalyst (Iran risk + Fed uncertainty) is live today, not speculative.",
+      risk: "Miner earnings are levered both ways — a sharp reversal in gold (e.g. quick Iran de-escalation, hawkish Fed pivot) hits NEM harder than the metal itself."
+    }
+  ],
+  longTerm: [
+    {
+      ticker: "ACN",
+      name: "Accenture plc",
+      exchange: "NYSE",
+      whyBuy: "Flagged as undervalued by multiple screens this month despite a dominant position in enterprise AI and digital transformation consulting — strong recurring revenue, high free cash flow conversion, and a moat built on client switching costs that's hard to replicate.",
+      entry: "Consulting names lag the AI story rather than lead it; use any earnings-season-driven pullback in the group as an entry rather than chasing strength."
+    },
+    {
+      ticker: "ASML",
+      name: "ASML Holding NV",
+      exchange: "Euronext Amsterdam",
+      whyBuy: "The only supplier of EUV lithography machines needed for leading-edge chips — a true monopoly moat on the most durable multi-year theme in markets (AI/semiconductor capex), and it settles in euros on Bolero with zero currency drag for a Belgian investor.",
+      entry: "Never screens statistically cheap given the quality of the business; build the position in tranches around quarterly capex commentary from TSMC, Intel and Samsung rather than trying to time a single entry."
+    },
+    {
+      ticker: "UCB",
+      name: "UCB SA",
+      exchange: "Euronext Brussels",
+      whyBuy: "Belgian biopharma with a genuine home-market edge on Bolero — Bimzelx's expanding label across immunology indications and a deep late-stage neurology pipeline give multi-year earnings visibility that's largely decoupled from the AI-capex debate dominating the tape.",
+      entry: "Euronext Brussels listing, no FX conversion needed. Add on any pipeline-readout disappointment or sector-wide pharma weakness rather than at 52-week highs."
+    },
+    {
+      ticker: "MU",
+      name: "Micron Technology",
+      exchange: "Nasdaq",
+      whyBuy: "Structurally positioned at the AI memory bottleneck via HBM chips — demand from every major AI accelerator maker keeps growing faster than supply, and the stock's 12-month run reflects a real earnings re-rating, not pure sentiment.",
+      entry: "Highly volatile group; scale in over several sessions and treat any earnings-season chip-sector selloff (Intel reports Thursday) as an add point rather than a red flag."
+    }
+  ],
+  etf: {
+    ticker: "XDWE",
+    name: "Xtrackers MSCI World Energy UCITS ETF",
+    exchange: "Xetra / Euronext",
+    horizon: "Short-term trade",
+    rationale: "Broad, diversified exposure to global oil & gas majors and services companies — captures today's Hormuz-driven oil spike without betting on which single name benefits most, and stays UCITS-wrapped and Bolero-accessible. A cleaner way to trade the current geopolitical risk premium than picking individual drillers.",
+    also: "For a long-term core holding once this trade is closed out, the iShares Core S&P 500 UCITS ETF (CSPX) remains the cheapest, most liquid broad-market anchor available on Bolero at a 0.07% expense ratio."
+  },
+  watch: [
+    "Alphabet and Tesla report Wednesday — Alphabet's AI capex commentary is the single biggest swing factor for the broader tech rally this week; Tesla's margin trajectory and Cybercab progress matter more than the top line.",
+    "Intel and IBM report Thursday — Intel's stock has already priced a strong quarter after its 160%+ YTD run, raising the bar for any beat to matter; IBM needs to stabilise after last week's 25% plunge.",
+    "Strait of Hormuz developments — any further escalation (or a surprise de-escalation) between the US, Iran and Gulf shipping lanes will move oil, gold and the energy trade above faster than any single earnings report this week.",
+    "US Strategic Petroleum Reserve and Fed commentary — with the SPR at its lowest since 1983, there's little policy buffer left against a further oil shock, and a hawkish Fed reaction to oil-driven inflation would hit richly-valued tech hardest."
+  ]
+};
+</script>
+<!-- ══════════════════════════════════════════════════════════════ -->
+
+<script>
+const SK = 'mib_v4';
+let hist = [];
+try { hist = JSON.parse(localStorage.getItem(SK) || '[]'); } catch(e) {}
+if (!hist.find(b => b.date === LATEST_BRIEFING.date)) {
+  hist.unshift(LATEST_BRIEFING);
+  hist = hist.slice(0, 60);
+  try { localStorage.setItem(SK, JSON.stringify(hist)); } catch(e) {}
+}
+let cur = 0;
+
+const fmtFull  = d => new Date(d+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+const fmtShort = d => new Date(d+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+const fmtDay   = d => new Date(d+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short'});
+const x = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+const dotSVG = `<svg viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>`;
+
+function render() {
+  document.getElementById('root').innerHTML = buildPage();
+  document.querySelectorAll('.dtab').forEach((el,i) => el.addEventListener('click', () => { cur=i; render(); }));
+}
+
+function buildPage() {
+  const b = hist[cur];
+  if (!b) return `
+    <div class="topbar"></div>
+    <div class="header"><div class="header-inner"><div class="brand"><div class="brand-mark">📈</div><div class="brand-text"><div class="brand-name">Morning Investment Briefing</div><div class="brand-sub">Bolero Belgium · Curated Daily</div></div></div></div></div>
+    <div class="page"><div class="empty"><div class="eicon">📋</div><h2>No briefings yet</h2><p>Your first briefing will appear here tomorrow morning.</p></div></div>`;
+
+  const moodShort = (b.mood||'').split('—')[0].trim();
+  const tabs = hist.map((h,i) => `<div class="dtab${i===cur?' active':''}"><span class="wd">${fmtDay(h.date)}</span>${fmtShort(h.date)}</div>`).join('');
+
+  const macroRows = (b.macro||[]).map(m => `
+    <div class="macro-row">
+      <div class="macro-bullet">${dotSVG}</div>
+      <div class="macro-text">${x(m)}</div>
+    </div>`).join('');
+
+  const stCards = (b.shortTerm||[]).map(p => `
+    <div class="stock-card">
+      <div class="card-bar st"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="card-ticker-wrap">
+            <div class="card-ticker">${x(p.ticker)}</div>
+            <div class="card-company">${x(p.name)}</div>
+          </div>
+          <span class="exch-chip">${x(p.exchange)}</span>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-fields">
+          <div class="card-field"><span class="field-key why">Why now</span><span class="field-val">${x(p.whyNow)}</span></div>
+          <div class="card-field"><span class="field-key risk">Risk</span><span class="field-val">${x(p.risk)}</span></div>
+        </div>
+      </div>
+    </div>`).join('');
+
+  const ltCards = (b.longTerm||[]).map(p => `
+    <div class="stock-card">
+      <div class="card-bar lt"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="card-ticker-wrap">
+            <div class="card-ticker">${x(p.ticker)}</div>
+            <div class="card-company">${x(p.name)}</div>
+          </div>
+          <span class="exch-chip">${x(p.exchange)}</span>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-fields">
+          <div class="card-field"><span class="field-key why">Why buy</span><span class="field-val">${x(p.whyBuy)}</span></div>
+          <div class="card-field"><span class="field-key entry">Entry</span><span class="field-val">${x(p.entry)}</span></div>
+        </div>
+      </div>
+    </div>`).join('');
+
+  const etfHTML = b.etf ? `
+    <div class="etf-card">
+      <div class="etf-bar"></div>
+      <div class="etf-body">
+        <div class="etf-top">
+          <div class="etf-ticker-wrap">
+            <div class="etf-ticker">${x(b.etf.ticker)}</div>
+            <div class="etf-name">${x(b.etf.name)}</div>
+            <div class="etf-exch">${x(b.etf.exchange)}</div>
+          </div>
+          <span class="horizon-chip">${x(b.etf.horizon)}</span>
+        </div>
+        <div class="etf-divider"></div>
+        <div class="etf-rationale">${x(b.etf.rationale)}</div>
+        ${b.etf.also ? `<div class="etf-also">${x(b.etf.also)}</div>` : ''}
+      </div>
+    </div>` : '';
+
+  const watchCards = (b.watch||[]).map((w,i) => `
+    <div class="watch-card">
+      <div class="watch-num">${i+1}</div>
+      <div class="watch-text">${x(w)}</div>
+    </div>`).join('');
+
+  return `
+    <div class="topbar"></div>
+    <div class="header">
+      <div class="header-inner">
+        <div class="brand">
+          <div class="brand-mark">📈</div>
+          <div class="brand-text">
+            <div class="brand-name">Morning Investment Briefing</div>
+            <div class="brand-sub">Bolero Belgium · Curated Daily</div>
+          </div>
+        </div>
+        <div class="header-meta">
+          <div class="header-date">${fmtFull(b.date)}</div>
+          ${moodShort ? `<div class="mood-tag">${x(moodShort)}</div>` : ''}
+        </div>
+      </div>
+      <div class="date-strip">${tabs}</div>
+    </div>
+
+    <div class="page">
+
+      <div class="sec">
+        <div class="sec-head">
+          <div class="sec-icon sky">🌍</div>
+          <span class="sec-label">Macro Snapshot</span>
+          <div class="sec-rule"></div>
+        </div>
+        <div class="macro-wrap">
+          <div class="macro-bar"></div>
+          <div class="macro-body">${macroRows}</div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head">
+          <div class="sec-icon amber">🔥</div>
+          <span class="sec-label">Short-Term Opportunities</span>
+          <div class="sec-rule"></div>
+        </div>
+        <div class="stock-grid">${stCards || '<p style="color:var(--muted);font-size:13px">No short-term picks today.</p>'}</div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head">
+          <div class="sec-icon green">📈</div>
+          <span class="sec-label">Long-Term Watchlist</span>
+          <div class="sec-rule"></div>
+        </div>
+        <div class="stock-grid">${ltCards || '<p style="color:var(--muted);font-size:13px">No long-term picks today.</p>'}</div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head">
+          <div class="sec-icon violet">💡</div>
+          <span class="sec-label">ETF of the Day</span>
+          <div class="sec-rule"></div>
+        </div>
+        ${etfHTML || '<p style="color:var(--muted);font-size:13px">No ETF pick today.</p>'}
+      </div>
+
+      <div class="sec">
+        <div class="sec-head">
+          <div class="sec-icon rose">⚠️</div>
+          <span class="sec-label">What to Watch Today</span>
+          <div class="sec-rule"></div>
+        </div>
+        <div class="watch-list">${watchCards}</div>
+      </div>
+
+      ${b.mood ? `<div class="mood-footer"><strong>Overall mood:</strong> ${x(b.mood)}</div>` : ''}
+
+      <div class="disclaimer">
+        For informational purposes only — not financial advice. Always conduct your own research before making investment decisions.<br>
+        Briefing history is stored locally in your browser (up to 60 days).
+      </div>
+
+    </div>`;
+}
+
+document.addEventListener('DOMContentLoaded', render);
+</script>
+
+<div id="root"></div>
+</body>
+</html>
