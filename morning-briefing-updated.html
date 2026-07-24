@@ -1,0 +1,718 @@
+<!DOCTYPE html><script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Morning Investment Briefing",
+  "schemaVersion": 1,
+  "description": "Daily morning investment briefing for Christophe — curated short and long-term picks available on Bolero Belgium, with day-by-day history navigation. Updated each morning by the scheduled task."
+}
+</script>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Morning Investment Briefing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink:       #0d1117;
+      --ink-2:     #1f2937;
+      --ink-3:     #374151;
+      --muted:     #6b7280;
+      --faint:     #9ca3af;
+      --border:    #e5e7eb;
+      --border-2:  #f3f4f6;
+      --bg:        #f9fafb;
+      --surface:   #ffffff;
+      --sky:       #0284c7;
+      --sky-dark:  #0369a1;
+      --sky-light: #e0f2fe;
+      --sky-mid:   #bae6fd;
+      --emerald:        #059669;
+      --emerald-light:  #d1fae5;
+      --emerald-mid:    #6ee7b7;
+      --amber:          #d97706;
+      --amber-light:    #fef3c7;
+      --amber-mid:      #fcd34d;
+      --rose:           #e11d48;
+      --rose-light:     #ffe4e6;
+      --violet:         #7c3aed;
+      --violet-light:   #ede9fe;
+      --violet-mid:     #c4b5fd;
+      --r: 12px;
+      --r-sm: 8px;
+      --r-lg: 16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .topbar { height: 3px; background: linear-gradient(90deg, #0284c7 0%, #7c3aed 50%, #059669 100%); }
+    .header { background: var(--ink); padding: 0 28px; position: sticky; top: 0; z-index: 200; }
+    .header-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 0 0; }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand-mark { width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0; background: linear-gradient(135deg, var(--sky) 0%, var(--violet) 100%); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .brand-name { font-size: 15px; font-weight: 800; color: #fff; letter-spacing: -0.4px; line-height: 1.2; }
+    .brand-sub { font-size: 10px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-top: 1px; }
+    .header-meta { text-align: right; }
+    .header-date { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); letter-spacing: 0.3px; }
+    .mood-tag { display: inline-block; margin-top: 4px; font-size: 11px; font-weight: 600; color: #6ee7b7; background: rgba(16,185,129,0.12); border: 1px solid rgba(110,231,183,0.25); border-radius: 20px; padding: 2px 10px; max-width: 220px; text-align: right; }
+    .date-strip { max-width: 960px; margin: 0 auto; display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; padding-top: 12px; }
+    .date-strip::-webkit-scrollbar { display: none; }
+    .dtab { flex-shrink: 0; cursor: pointer; user-select: none; padding: 8px 14px; border-radius: 8px 8px 0 0; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.35); transition: background 0.12s, color 0.12s; text-align: center; min-width: 72px; }
+    .dtab:hover { color: rgba(255,255,255,0.65); background: rgba(255,255,255,0.06); }
+    .dtab.active { color: var(--ink); background: var(--bg); font-weight: 700; }
+    .dtab .wd { display: block; font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; opacity: 0.7; margin-bottom: 2px; }
+    .page { max-width: 960px; margin: 0 auto; padding: 28px 28px 60px; }
+    .sec { margin-bottom: 32px; }
+    .sec-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .sec-icon { width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .sec-icon.sky    { background: var(--sky-light); }
+    .sec-icon.amber  { background: var(--amber-light); }
+    .sec-icon.green  { background: var(--emerald-light); }
+    .sec-icon.violet { background: var(--violet-light); }
+    .sec-icon.rose   { background: var(--rose-light); }
+    .sec-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+    .sec-rule { flex: 1; height: 1px; background: var(--border); }
+    .macro-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+    .macro-bar { height: 3px; background: linear-gradient(90deg, var(--sky) 0%, var(--sky-dark) 100%); }
+    .macro-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+    .macro-row { display: flex; gap: 12px; align-items: flex-start; }
+    .macro-bullet { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; margin-top: 1px; background: var(--sky-light); border: 2px solid var(--sky-mid); display: flex; align-items: center; justify-content: center; }
+    .macro-bullet svg { width: 8px; height: 8px; fill: var(--sky); }
+    .macro-text { font-size: 13.5px; color: var(--ink-2); line-height: 1.55; }
+    .stock-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 680px) { .stock-grid { grid-template-columns: 1fr 1fr; } }
+    .stock-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05); transition: box-shadow 0.18s, transform 0.18s; display: flex; flex-direction: column; }
+    .stock-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.1); transform: translateY(-1px); }
+    .card-bar { height: 3px; }
+    .card-bar.st { background: linear-gradient(90deg, var(--amber), #fbbf24); }
+    .card-bar.lt { background: linear-gradient(90deg, var(--emerald), #34d399); }
+    .card-body { padding: 16px 18px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .card-ticker { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 20px; font-weight: 700; color: var(--ink); letter-spacing: -0.5px; line-height: 1; }
+    .card-company { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 500; }
+    .exch-chip { font-size: 10px; font-weight: 600; letter-spacing: 0.4px; padding: 3px 9px; border-radius: 6px; background: var(--bg); border: 1px solid var(--border); color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+    .card-divider { height: 1px; background: var(--border-2); margin: 0 -18px; }
+    .card-fields { display: flex; flex-direction: column; gap: 8px; }
+    .card-field { display: flex; gap: 10px; }
+    .field-key { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; flex-shrink: 0; padding-top: 2px; min-width: 48px; }
+    .field-key.why   { color: var(--emerald); }
+    .field-key.entry { color: var(--sky); }
+    .field-key.risk  { color: var(--rose); }
+    .field-val { font-size: 12.5px; color: var(--ink-3); line-height: 1.55; }
+    .etf-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+    .etf-bar { height: 3px; background: linear-gradient(90deg, var(--violet), #a78bfa); }
+    .etf-body { padding: 18px 20px; }
+    .etf-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+    .etf-ticker { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 24px; font-weight: 700; color: var(--violet); letter-spacing: -0.5px; line-height: 1; }
+    .etf-name { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 500; }
+    .etf-exch { font-size: 11px; color: var(--faint); margin-top: 2px; }
+    .horizon-chip { font-size: 10px; font-weight: 700; letter-spacing: 0.4px; padding: 4px 12px; border-radius: 20px; background: var(--violet-light); color: var(--violet); border: 1px solid var(--violet-mid); white-space: nowrap; flex-shrink: 0; }
+    .etf-divider { height: 1px; background: var(--border-2); margin: 0 0 14px; }
+    .etf-rationale { font-size: 13px; color: var(--ink-3); line-height: 1.65; }
+    .etf-also { margin-top: 10px; padding: 10px 14px; border-radius: var(--r-sm); background: var(--violet-light); border: 1px solid var(--violet-mid); font-size: 12px; color: var(--violet); line-height: 1.5; font-style: italic; }
+    .watch-list { display: flex; flex-direction: column; gap: 10px; }
+    .watch-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 14px 16px; display: flex; gap: 14px; align-items: flex-start; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .watch-num { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; background: var(--amber-light); border: 1.5px solid var(--amber-mid); color: var(--amber); font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .watch-text { font-size: 13px; color: var(--ink-3); line-height: 1.55; }
+    .mood-footer { margin-top: 12px; padding: 16px 20px; background: linear-gradient(135deg, #f0f9ff 0%, #f5f3ff 100%); border: 1px solid var(--border); border-radius: var(--r); font-size: 13.5px; color: var(--ink-2); text-align: center; line-height: 1.6; }
+    .mood-footer strong { font-weight: 700; color: var(--ink); }
+    .disclaimer { margin-top: 32px; text-align: center; font-size: 11px; color: var(--faint); line-height: 1.7; padding: 0 12px; }
+    .empty { text-align: center; padding: 80px 20px; }
+    .empty .eicon { font-size: 48px; margin-bottom: 16px; }
+    .empty h2 { font-size: 20px; font-weight: 800; color: var(--ink); margin-bottom: 8px; }
+    .empty p { font-size: 13px; color: var(--muted); }
+    @media (max-width: 600px) {
+      .header { padding: 0 16px; }
+      .page { padding: 20px 16px 48px; }
+      .brand-name { font-size: 14px; }
+      .header-date { font-size: 11px; }
+      .mood-tag { font-size: 10px; max-width: 160px; }
+      .dtab { min-width: 64px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     BRIEFING_HISTORY  —  prepended by the scheduled task each morning
+     ══════════════════════════════════════════════════════════════ -->
+<script type="application/json" id="briefing-history">
+[
+  {
+    "date": "2026-07-24",
+    "mood": "Post-earnings hangover — hyperscaler capex shock deepens the Nasdaq selloff, but the pain is creating real entry points in AI infrastructure beneficiaries (Vertiv, NextEra, Cameco) and European quality names ahead of UCB earnings July 30",
+    "macro": [
+      "S&P 500 fell 1.21% to 7,408 and Nasdaq tumbled 2.15% to 25,138 on July 23 — biggest single-day decline in a month, as Alphabet (-7%) and Tesla (-14%) post-earnings selloffs dragged the indices lower despite both companies delivering strong headline beats.",
+      "Hyperscaler capex shock: Alphabet doubled its 2026 capex forecast to $205B while generating negative free cash flow, triggering a market-wide re-rating of AI infrastructure spend. Microsoft, Meta, Amazon, and Oracle fell 3-5% in sympathy as investors question whether AI spend is investment or liability.",
+      "Oil above $100/barrel for the first time in two months — Houthi militants attacked two Saudi Arabian tankers in the Red Sea, reigniting Middle East conflict fears and pushing Brent sharply higher. Sustained oil above $100 complicates the Fed's rate-cut path and adds inflation risk.",
+      "Bank of America reaffirmed a year-end S&P 500 target of 7,100 — implying a further ~4% downside from current levels — explicitly calling out 'speculation hitting extreme levels' in AI and growth equities."
+    ],
+    "shortTerm": [
+      {
+        "ticker": "VRT",
+        "name": "Vertiv Holdings Co",
+        "exchange": "NYSE",
+        "whyNow": "Alphabet's $205B capex commitment is Vertiv's revenue pipeline. Vertiv reported a $15B backlog in early 2026 and raised full-year adjusted EPS guidance to $6.30-$6.40 (50-52% YoY growth), driven entirely by AI data center power and thermal management demand. While the Nasdaq sells off on capex concerns, the actual beneficiary of that capex spend is exactly what Vertiv builds. Joined the S&P 500 in March 2026, adding index-buyer demand. Buy on any market-wide weakness.",
+        "risk": "The AI buildout thesis is entirely priced in at current multiples — if any hyperscaler signals a pause or delay in data center construction timelines, backlog conversion slows and the multiple compresses hard."
+      },
+      {
+        "ticker": "ARGX",
+        "name": "argenx SE",
+        "exchange": "Nasdaq / Euronext Brussels",
+        "whyNow": "Reported H1 2026 product net sales of $1.5B — 60% YoY growth, 17% QoQ. The business is accelerating, not slowing. A registrational autoimmune myositis study readout is on track for Q3 2026, the next major label expansion catalyst. Analyst consensus target $1,025 implies 28.3% upside from current levels. Dual-listed — accessible on Bolero via Euronext Brussels in euros, with no FX drag. Belgium-headquartered flagship biotech.",
+        "risk": "A failed or inconclusive myositis readout in Q3 removes the near-term re-rating catalyst and could trigger a 15-20% correction. High-conviction but high-multiple name."
+      },
+      {
+        "ticker": "CCJ",
+        "name": "Cameco Corporation",
+        "exchange": "NYSE",
+        "whyNow": "With oil spiking above $100 and AI data centers projected to consume 12% of US electricity by 2028, nuclear energy is the only credible baseload solution. Microsoft, Google, and Amazon have all signed nuclear power supply agreements in 2026. Cameco is the world's largest publicly traded uranium producer — the pick-and-shovel play on the nuclear renaissance. Oil's surge makes uranium's economics even more compelling by comparison.",
+        "risk": "Uranium markets are thin and sentiment-driven. Any high-profile nuclear incident globally or political headwinds on new reactor approvals creates sharp drawdowns regardless of demand fundamentals."
+      }
+    ],
+    "longTerm": [
+      {
+        "ticker": "NEE",
+        "name": "NextEra Energy Inc",
+        "exchange": "NYSE",
+        "whyBuy": "AI data centers need reliable, clean baseload electricity — NextEra has a 21GW data center power pipeline and recently announced the acquisition of Dominion Energy to create the world's largest regulated electric utility. Oil spiking above $100 makes clean electricity generation structurally more competitive. The demand curve for NextEra's output is AI-driven and multi-decade; the business is essentially a regulated infrastructure toll road on the AI electricity demand surge.",
+        "entry": "Not cheap at ~22x earnings but this is a utility with unusually high earnings visibility. Accumulate in tranches on any macro-driven pullback; 3-5 year hold minimum to capture the full AI power demand cycle."
+      },
+      {
+        "ticker": "UCB",
+        "name": "UCB SA",
+        "exchange": "Euronext Brussels",
+        "whyBuy": "Belgian pharma reporting Q2 2026 earnings on July 30 — six days away. Analyst consensus: 15 Buys, 2 Sells, average 12-month target €287.68. Recent catalysts include KYGEVVI approval for TK2d (adults and pediatric), new rozanolixizumab and zilucoplan data, and €1.45/share gross dividend. The FcRn inhibitor platform is a multi-indication franchise still in early commercial ramp. Belgian-listed on Bolero — zero FX exposure, home-market liquidity advantage.",
+        "entry": "Pre-earnings entry here provides six-day exposure to a potential catalyst. Scale up if the stock pulls back with the broader market this week. Long-term thesis is the FcRn platform expanding across multiple autoimmune indications over 3-5 years."
+      },
+      {
+        "ticker": "ASML",
+        "name": "ASML Holding NV",
+        "exchange": "Euronext Amsterdam",
+        "whyBuy": "Unchanged conviction. Every advanced AI chip — Nvidia, AMD, TSMC — requires ASML's EUV lithography machines. Hyperscaler capex doubling is ASML's tailwind, not its problem. 2026 guidance raised to €43-45B. Euro-listed on Bolero, no FX drag. The selloff in tech stocks today has nothing to do with ASML's order pipeline.",
+        "entry": "Any chip-sector fear episode is the add opportunity. Use today's macro-driven pullback to build or add to a position. Five-year hold minimum."
+      },
+      {
+        "ticker": "NEM.DE",
+        "name": "Nemetschek SE",
+        "exchange": "Xetra",
+        "whyBuy": "European software trading at €57.95 vs intrinsic value estimate of €82.24 — a 30%+ discount to fair value. Earnings grew 30.9% last year, forecast +18.7% annually. Dominant construction and architecture SaaS platform with high switching costs and recurring revenue. Entirely decoupled from the AI capex debate — building permits and construction software don't care about Alphabet's capex.",
+        "entry": "Start a position at the current price. Quality software company at a rare valuation discount. 3-5 year compounder thesis."
+      }
+    ],
+    "etf": {
+      "ticker": "BNKE",
+      "name": "Amundi Euro Stoxx Banks UCITS ETF Acc",
+      "exchange": "Euronext",
+      "horizon": "Short-term trade",
+      "rationale": "Oil above $100 and renewed Middle East tensions push back the ECB rate-cut timeline — European banks win from rates staying higher for longer. BNKE gives concentrated exposure to KBC, BNP Paribas, ING, UniCredit, and other euro area banks at a low TER. The thesis: if the oil spike sustains, inflation expectations rise, rate cuts get delayed, and bank net interest margins stay fat. Also acts as a partial hedge against the tech selloff — financials move independently of Nasdaq sentiment.",
+      "also": "iShares Core MSCI World UCITS ETF (IWDA.AS on Euronext Amsterdam, 0.20% TER) — the tech-driven pullback is creating a better cost-averaging entry for the long-term core position. Add to IWDA on today's weakness alongside the BNKE trade."
+    },
+    "watch": [
+      "UCB SA Q2 2026 earnings July 30 — six days out; 15 analyst buys with avg target €287.68. Key metrics: rozanolixizumab commercial ramp, KYGEVVI launch progress, and full-year guidance. Enter before the print for Bolero investors.",
+      "Oil / Brent above $100 trajectory — sustained Brent above $100 changes the Fed's rate-cut calculus, compresses growth multiples further, and supports energy (TotalEnergies) and European bank positions. Watch for any diplomatic or military response to the Houthi tanker attacks.",
+      "Microsoft, Meta, Amazon earnings (upcoming) — if they match Alphabet's capex-doubling pattern, the tech selloff deepens further. If they show capital discipline, markets recover sharply. These prints are the biggest remaining swing factor for Q3 market direction.",
+      "Fed speakers this week — with oil spiking and BofA calling for further S&P downside to 7,100, any hawkish commentary on rate-cut delays would accelerate rotation from growth/tech into value and defensives."
+    ]
+  },
+  {
+    "date": "2026-07-23",
+    "mood": "Earnings reality check — Alphabet's blowout cloud beat (+82%) is clouded by record $44.9B capex and negative free cash flow, while Intel reports tonight; markets wrestle with whether AI spend is still an investment or becoming a liability",
+    "macro": [
+      "Alphabet Q2 2026 blowout: revenue $119.8B (+24% YoY, beat $116.9B est.), Google Cloud surged 82% to $24.8B — but FCF turned negative at -$5.9B as $44.9B capex dwarfed operating cash flow. Stock sank post-market as bulls and bears split hard on whether the AI spend is creating durable value.",
+      "Intel reports Q2 2026 earnings tonight after close — analysts expect $0.22 EPS and $14.42B revenue (+12% YoY). Stock up 163% YTD but off 27% from June peak; 18A foundry yields at 85% and Apple/Microsoft 18A-P partnerships are the key catalysts to watch.",
+      "Iran war risk keeps oil elevated — peace-talk pessimism persists, sustaining the geopolitical premium on Brent crude and supporting energy sector names.",
+      "Trump administration plans 100% tariff on imported generic pharmaceuticals from August 2028 — creates a medium-term headwind for generic pharma but potential tailwind for domestic US drug manufacturers."
+    ],
+    "shortTerm": [
+      {
+        "ticker": "GOOGL",
+        "name": "Alphabet Inc (Class A)",
+        "exchange": "Nasdaq",
+        "whyNow": "Yesterday's Q2 was a genuine beat — cloud +82% to $24.8B, revenue $119.8B vs $116.9B est., operating margin expanded 2pts to 34%. The stock is sinking today on the $44.9B capex and -$5.9B FCF, not the business fundamentals. This is a technically-driven dip into a structurally strong name — the cloud backlog alone exceeded $500B. High conviction buy on the post-earnings weakness if it holds the 200-day moving average.",
+        "risk": "The capex debate is legitimate — if AI infrastructure spend does not translate to margin expansion by H1 2027, the bear case on negative FCF compounds. Regulatory risk from DOJ antitrust (search monopoly) remains a live overhang."
+      },
+      {
+        "ticker": "INTC",
+        "name": "Intel Corporation",
+        "exchange": "Nasdaq",
+        "whyNow": "Reports tonight with options pricing a 15% swing. Street expects $0.22 EPS and $14.42B revenue. The 27% pullback from June highs sets a lower bar than the Q1 beat (+23.6% session pop). 18A foundry yields at 85% and confirmed Apple/Microsoft 18A-P partnerships are structural positives the market is not fully pricing at current levels. If Intel beats and raises, it's a high-velocity post-earnings catalyst.",
+        "risk": "The stock is up 163% YTD — the bar for a meaningful beat is high and any guidance disappointment on gross margins (guided ~39%) will unwind the pre-earnings positioning fast. Speculative; position-size accordingly."
+      },
+      {
+        "ticker": "ASML",
+        "name": "ASML Holding NV",
+        "exchange": "Euronext Amsterdam",
+        "whyNow": "Intel's 18A process ramp (85% yield) and continued hyperscaler AI fab buildout directly support ASML's EUV order pipeline. A strong Intel print tonight would be a positive read-through for ASML's H2 2026 order intake. Euro-settled on Bolero — no FX drag for a Belgian investor.",
+        "risk": "US export controls on EUV to China remain the perennial overhang — any escalation in the chip war cuts addressable market and compresses the multiple."
+      }
+    ],
+    "longTerm": [
+      {
+        "ticker": "SAP",
+        "name": "SAP SE",
+        "exchange": "Xetra / Euronext",
+        "whyBuy": "World's largest enterprise application software provider, down 35% YTD and trading 37% below Morningstar/GF fair value estimates (GF Value ~$252, current ~$158). PE of 21x vs 5-year historical average 33x — the most affordable it has been on a relative basis in years. The AI migration of SAP's installed base to S/4HANA and RISE with SAP is a multi-year earnings catalyst that's entirely decoupled from the AI infrastructure capex debate. Berenberg maintains Buy. Xetra-listed, directly accessible on Bolero.",
+        "entry": "37% discount to fair value is a rare setup in a quality business with this level of mission-criticality (switching costs are enormous for SAP customers). Build a starter position now; add on any further weakness toward the 52-week low of $148. Three-to-five year hold minimum."
+      },
+      {
+        "ticker": "GOOGL",
+        "name": "Alphabet Inc (Class A)",
+        "exchange": "Nasdaq",
+        "whyBuy": "Google Cloud growing 82% YoY is not a fluke — the contracted backlog is now $500B+. Advertising revenues beat expectations with AI Overviews monetizing faster than forecast. Negative FCF from capex is a timing issue, not a structural one; Alphabet has never had a balance sheet problem. At a 34% operating margin and with YouTube, Search, and Cloud all growing double-digits, this is a core compounder available at a post-earnings dip discount.",
+        "entry": "Use today's post-earnings selloff on capex concerns as the entry. The fundamental case has improved materially; the stock is cheaper than it was yesterday morning. Accumulate over 2-3 sessions, don't try to catch the exact low."
+      },
+      {
+        "ticker": "ASML",
+        "name": "ASML Holding NV",
+        "exchange": "Euronext Amsterdam",
+        "whyBuy": "The only manufacturer of EUV lithography machines — monopoly on the single most critical bottleneck of the semiconductor industry. Every advanced AI chip from Nvidia, AMD, Apple, and TSMC requires ASML machines. 2026 guidance raised to €43-45B. Euro-settled on Bolero with no FX drag. Intel's 18A ramp tonight is a direct demand signal.",
+        "entry": "Build in tranches. A strong Intel print tonight could lift ASML tomorrow — either enter before close today or wait for post-Intel consolidation next week. Long-term conviction is high regardless of timing."
+      },
+      {
+        "ticker": "AVGO",
+        "name": "Broadcom Inc",
+        "exchange": "Nasdaq",
+        "whyBuy": "Morningstar flagged Broadcom as undervalued in July 2026 — an amalgamation of high-value differentiated chip and software businesses (VMware integration now largely complete). AI ASIC design wins with hyperscalers (Google, Meta, Apple) create a durable AI revenue stream that is less commoditized than GPU supply. The software division provides recurring revenue to smooth chip-cycle volatility.",
+        "entry": "Not cheap on headline multiples but growing into its valuation rapidly. Use any broad chip-sector weakness (e.g. Intel guidance miss tonight) as the entry. A 3-5 year hold thesis centered on AI ASIC demand acceleration."
+      }
+    ],
+    "etf": {
+      "ticker": "EXSA",
+      "name": "iShares STOXX Europe 600 UCITS ETF (DE)",
+      "exchange": "Xetra / Euronext",
+      "horizon": "Long-term core holding",
+      "rationale": "SAP's 35% YTD decline has created meaningful valuation dislocations across European tech and industrials — the STOXX 600 now screens attractively versus US equivalents. EXSA gives diversified exposure to 600 European companies including SAP, ASML, Schneider Electric, and TotalEnergies at a 0.20% TER. In a week where US mega-cap AI earnings are injecting volatility, a European allocation provides geographic diversification while still capturing AI infrastructure themes via the ASML and SAP weightings. Directly Xetra/Euronext-listed and accessible on Bolero with euro settlement — zero FX conversion costs.",
+      "also": "Xtrackers MSCI World ex USA UCITS ETF (EXUS on Xetra) at 0.15% TER — broader developed-market ex-US exposure if you want to diversify beyond Europe alone."
+    },
+    "watch": [
+      "Intel Q2 2026 earnings tonight after close — $0.22 EPS and $14.42B revenue expected; 18A foundry yield progress (currently 85%) and Apple/Microsoft partnership updates are the key read-throughs for ASML and the broader semiconductor supply chain.",
+      "Alphabet/GOOGL post-earnings price action — watch whether the stock stabilizes above key support on the $44.9B capex concern; a hold or bounce would confirm the cloud-growth narrative is winning the bull/bear debate.",
+      "Iran war developments — any escalation or de-escalation in peace talks will move oil, and by extension, European energy names (TotalEnergies) and inflation expectations.",
+      "Generic pharma sector response to Trump's 100% tariff announcement — the August 2028 timeline gives the market time to price in the impact; watch European pharma generics names on Euronext for the initial reaction."
+    ]
+  },
+  {
+    "date": "2026-07-22",
+    "mood": "Risk-on momentum — AI chip rally broadens globally with Nasdaq +1.29% and Korea's Kospi surging 4.6%, as mega-cap earnings season reaches its most consequential week with Alphabet and Tesla on deck",
+    "macro": [
+      "US markets rise broadly: S&P 500 +0.89%, Nasdaq Composite +1.29%, Dow +0.74% — chip stocks lead a global AI rally as investors re-commit to the AI infrastructure trade after last week's consolidation.",
+      "South Korea's Kospi jumps 4.6% — the single biggest move in Asia today, reversing a 30% drawdown driven by unwinding leveraged bets. The Kospi is the world's most reliable bellwether for AI chip demand (Samsung, SK Hynix); its recovery signals the AI supply chain is intact.",
+      "MSCI Asia Pacific +1.3%, extending Tuesday's biggest one-day gain in a month — risk appetite is genuinely returning to emerging and Asian equities, not just US large caps.",
+      "Oil ticks higher on US-Iran peace talk pessimism — negotiators see little near-term resolution, keeping energy inflation risk alive as Alphabet and Tesla prepare to report earnings this week."
+    ],
+    "shortTerm": [
+      {
+        "ticker": "GOOGL",
+        "name": "Alphabet Inc (Class A)",
+        "exchange": "Nasdaq",
+        "whyNow": "Reports earnings this week with zero Sell ratings on Wall Street — 44 Buy and 14 Strong Buy. Analyst price targets cluster $414–$442 (roughly 16–24% above current levels). The market will be watching AI monetisation through Search (AI Overviews ad revenue) and Google Cloud growth. A strong beat + raised guidance would be a major catalyst for the whole Nasdaq. Available on Bolero via Nasdaq.",
+        "risk": "Regulatory overhang from the DOJ antitrust case in search could resurface at any moment; if the earnings beat but guidance disappoints on cloud margins, the stock underperforms the initial reaction."
+      },
+      {
+        "ticker": "ASML",
+        "name": "ASML Holding NV",
+        "exchange": "Euronext Amsterdam",
+        "whyNow": "Today's Kospi +4.6% recovery is a direct signal that AI chip supply chain sentiment is turning — ASML sits at the upstream bottleneck of every advanced chip fab. Already beat Q2 on July 15 and raised full-year guidance to €43–45B. Euro-listed on Bolero with no FX drag for a Belgian investor.",
+        "risk": "US export controls on EUV shipments to China remain the key overhang — any escalation in the US-China chip war would cut ASML's addressable market and compress its multiple quickly."
+      },
+      {
+        "ticker": "MU",
+        "name": "Micron Technology Inc",
+        "exchange": "Nasdaq",
+        "whyNow": "AI memory (HBM) demand is growing faster than supply, and every AI chip built needs Micron's technology. Flagged as a top AI infrastructure play alongside TSMC. The Korea AI recovery today (HBM peer SK Hynix up sharply) is a direct read-through for Micron's near-term demand environment.",
+        "risk": "Semiconductor cycles are notoriously volatile — a slowdown in hyperscaler AI capex spending would hit memory demand harder and faster than almost any other subsector."
+      },
+      {
+        "ticker": "ISRG",
+        "name": "Intuitive Surgical Inc",
+        "exchange": "Nasdaq",
+        "whyNow": "After beating Q2 hard (revenue +19% YoY, da Vinci 5 placements +37%), ISRG is at ~$407 vs analyst consensus target of $573 — a 41% implied upside in a high-conviction buy from Wall Street. P/E compressed to 47x vs 5-year average 68x after a 35% YTD drawdown driven by macro sentiment, not fundamentals.",
+        "risk": "Absolute valuation remains high at 47x; any slowdown in hospital capex or macro deterioration slows da Vinci 5 placements and removes the re-rating catalyst."
+      }
+    ],
+    "longTerm": [
+      {
+        "ticker": "ASML",
+        "name": "ASML Holding NV",
+        "exchange": "Euronext Amsterdam",
+        "whyBuy": "The only company that makes EUV lithography machines — a structural monopoly on the single most critical bottleneck in the entire semiconductor industry. Every AI chip from Nvidia, AMD, Apple, and TSMC requires ASML machines. 2026 guidance raised to €43–45B; analysts see a path to $3,000/share from ~$1,800 today over 5 years. Euro-settled on Bolero — no FX drag for a Belgian investor.",
+        "entry": "Build in tranches; best entry points come around quarterly earnings or when chip-sector fear spikes (like last week's Kospi -30% episode). Avoid chasing post-guidance-raise rallies — wait for the next pullback."
+      },
+      {
+        "ticker": "SU",
+        "name": "Schneider Electric SE",
+        "exchange": "Euronext Paris",
+        "whyBuy": "Pure-play on AI data center power management and the energy transition — two multi-year structural themes running simultaneously. Every hyperscaler building AI infrastructure needs Schneider's power and cooling solutions. Euro-listed on Bolero, no FX conversion required, and the company has compounded earnings at double digits for a decade.",
+        "entry": "Buy on any broad European market correction or sector rotation out of industrials. Accumulate over 12–18 months as a core portfolio holding rather than expecting a near-term catalyst."
+      },
+      {
+        "ticker": "BRK.B",
+        "name": "Berkshire Hathaway Inc (Class B)",
+        "exchange": "NYSE",
+        "whyBuy": "Diversified fortress balance sheet with a $347B equity portfolio, GEICO, BNSF, and 60 other subsidiaries. Flagged as trading below intrinsic value by multiple screens in July 2026. No single-stock risk, no sector concentration, and Warren Buffett's succession is now well-telegraphed and priced in. The ultimate defensive compounder for a Belgian investor with USD exposure.",
+        "entry": "No special catalyst needed — this is a buy-and-forget allocation. Bolero NYSE access is straightforward; the only note is USD/EUR FX exposure on a stock that itself holds USD assets."
+      },
+      {
+        "ticker": "ACN",
+        "name": "Accenture plc",
+        "exchange": "NYSE",
+        "whyBuy": "Enterprise AI and digital transformation leader — captures the enterprise spending wave that follows AI infrastructure buildout, typically 6–12 months after chips/cloud re-rate. Flagged as undervalued by InvestingPro's AI/analyst hybrid in July 2026. Recurring revenue, strong FCF, and deep client switching costs create a durable moat.",
+        "entry": "The consulting-to-AI narrative is still early. Use any Q3 earnings-season pullback to build a position before the enterprise AI capex cycle becomes consensus."
+      }
+    ],
+    "etf": {
+      "ticker": "IWDA",
+      "name": "iShares Core MSCI World UCITS ETF USD Acc",
+      "exchange": "Euronext Amsterdam",
+      "horizon": "Long-term core holding",
+      "rationale": "In a week dominated by AI earnings noise and geopolitical risk, the cleanest move is adding to a diversified core. IWDA provides broad developed-market exposure at 0.20% TER and trades with tight spreads on Euronext Amsterdam — directly accessible on Bolero. Critically, MSCI World carries a ~25% weighting to tech, meaning you capture AI upside without betting on individual earnings outcomes. Week 28 2026 saw iShares lead European ETF inflows at €4.07B, confirming institutional demand. The Korea Kospi recovery today signals the AI supply chain is intact, which directly supports the tech-heavy world index.",
+      "also": "Xtrackers MSCI World UCITS ETF 1C (XWRD on Xetra) at 0.15% TER — marginally cheaper if you're cost-sensitive and comfortable with Xetra settlement."
+    },
+    "watch": [
+      "Alphabet earnings (this week) — forward guidance on AI Overviews ad revenue and Google Cloud margins is the single biggest market event of the week; a strong beat would reaffirm the AI monetisation narrative for the entire Nasdaq.",
+      "Tesla earnings (this week) — the stock is down ~22% from its peak on margin concerns; Cybercab progress and energy division growth are the key metrics beyond the car delivery numbers.",
+      "US-Iran peace talks — any breakthrough would rapidly unwind the oil risk premium (TotalEnergies, energy ETFs trade down); continued failure pushes Brent higher and raises inflation expectations.",
+      "South Korea Kospi follow-through — today's 4.6% surge must hold tomorrow to confirm the AI chip supply chain recovery is real, not a dead-cat bounce; watch ASML and semiconductor names closely."
+    ]
+  },
+  {
+    "date": "2026-07-21",
+    "mood": "Cautious bounce — chip stocks lead futures higher on peace-talk hopes, but a Houthi naval blockade threat on Saudi Arabia and 10-year yields at 4.59% keep conviction low ahead of mega-cap AI earnings",
+    "macro": [
+      "US futures up: Dow +0.35%, S&P 500 +0.5%, Nasdaq 100 +1.12% — rebounding from Monday's late fade; Asian equities rose for the first time in four days led by chipmakers after last week's sector selloff.",
+      "Geopolitical crosscurrents: early lift from reports the US and Iran are exploring mediation efforts, but Houthis are threatening a naval blockade of Saudi Arabia — oil is holding elevated even as peace-talk headlines circulate.",
+      "10-year US Treasury yield edged down 0.6 bps to 4.592%; 2-year at 4.204% — modest relief but no real rate-cut signal; curve still compressed.",
+      "Mega-cap AI earnings week continues: major tech names reporting imminently will be the real market verdict on whether AI capex is translating to revenue — any guidance cut could derail the Nasdaq rebound instantly."
+    ],
+    "shortTerm": [
+      {
+        "ticker": "ASML",
+        "name": "ASML Holding NV",
+        "exchange": "Euronext Amsterdam",
+        "whyNow": "Beat Q2 on July 15 and raised full-year guidance for the second time in 2026 — now guiding €43–45B in sales (vs €36–40B in April), implying 35% YoY growth. Q3 guided €11–12B vs €9.3B just reported, implying 20%+ sequential growth. Post-earnings consolidation around $1,800 is a cleaner entry than chasing pre-print momentum. CEO flagged 'extremely strong' order intake in H1.",
+        "risk": "Export control tightening on EUV to China remains an overhang — any escalation in US-China chip restrictions could cut the addressable market and compress the valuation multiple quickly."
+      },
+      {
+        "ticker": "ISRG",
+        "name": "Intuitive Surgical Inc",
+        "exchange": "Nasdaq",
+        "whyNow": "Down 35% YTD heading into Q2 — then beat hard: revenue +19% YoY to $2.89B, adjusted EPS +28% to $2.80, da Vinci 5 placements +37% YoY to 246 units. Stock now at ~$407 vs analyst consensus $573.50, implying 41% upside. P/E compressed to 47x vs 5-year average 68x — category leader at a discount to its own history after a sentiment-driven selloff.",
+        "risk": "High absolute valuation persists; any macro deterioration or hospital capex slowdown slows da Vinci 5 placements and there is limited cushion at 47x even at the depressed price."
+      }
+    ],
+    "longTerm": [
+      {
+        "ticker": "ASML",
+        "name": "ASML Holding NV",
+        "exchange": "Euronext Amsterdam",
+        "whyBuy": "The only manufacturer of EUV lithography systems — a structural monopoly on the bottleneck of the entire semiconductor industry. Every advanced AI chip (Nvidia, AMD, Apple, TSMC) requires ASML machines. 2026 guidance raised to €43–45B; analysts see a path to $3,000/share in 5 years from ~$1,800 today. Euro-settled on Bolero — no FX drag for a Belgian investor.",
+        "entry": "Build in tranches; best add points are around quarterly earnings or when chip-sector fear spikes. Avoid chasing post-guidance-raise rallies — the next dip is better than current levels."
+      },
+      {
+        "ticker": "ISRG",
+        "name": "Intuitive Surgical Inc",
+        "exchange": "Nasdaq",
+        "whyBuy": "~80% global market share in robotic surgery with the da Vinci 5 upgrade cycle now in full swing (placements +37% YoY in Q2). Recurring instrument/service revenue grew 23% YoY to $2.12B — a razor/razorblade model that compounds independently of new system sales. The 35% YTD drawdown is a rare entry into a durable compounder at below-average multiples.",
+        "entry": "Current price ~$407 with analyst target $573. Start a position here, add into any further macro-driven weakness. Three-to-five year hold, not a swing trade."
+      },
+      {
+        "ticker": "SU",
+        "name": "Schneider Electric SE",
+        "exchange": "Euronext Paris",
+        "whyBuy": "Pure-play on two of the biggest multi-year structural themes: AI data center power/cooling management and the energy transition. Every hyperscaler building AI infrastructure needs Schneider's solutions. Euro-listed on Bolero, no FX conversion needed, and the company has compounded earnings at double digits for a decade.",
+        "entry": "Doesn't come cheap, but buy on any broad European market correction or rotation out of industrials. Accumulate over 12–18 months as a core portfolio holding."
+      },
+      {
+        "ticker": "ACN",
+        "name": "Accenture plc",
+        "exchange": "NYSE",
+        "whyBuy": "Flagged as undervalued by multiple screens in July 2026. Enterprise AI and digital transformation consulting leader with high recurring revenue, strong FCF conversion, and deep client switching costs. Captures the enterprise spend wave that follows AI infrastructure buildout — the second monetization leg after chips and cloud.",
+        "entry": "Consulting names lag AI infrastructure stocks by 6–12 months; this is that window. Use any Q3 earnings-season pullback to build before consensus catches up to the AI enterprise spend thesis."
+      }
+    ],
+    "etf": {
+      "ticker": "XWRD",
+      "name": "Xtrackers MSCI World UCITS ETF 1C",
+      "exchange": "Xetra / Euronext",
+      "horizon": "Long-term core holding",
+      "rationale": "Broad developed-market equity exposure at a 0.15% TER — cheaper than the equivalent iShares MSCI World (IWDA at 0.20%) with comparable liquidity. In a week dominated by AI earnings noise and geopolitical uncertainty, adding to a globally diversified core position beats trying to time the next sector rotation. The MSCI World's 25%+ tech weighting means you still capture AI upside without single-stock volatility. Week 28 2026 saw iShares lead European ETF inflows at €4.07B, followed by Vanguard at €1.53B and Xtrackers at €1.44B — strong institutional demand validates the broad-market allocation.",
+      "also": "iShares Core MSCI World UCITS ETF (IWDA) on Euronext Amsterdam — slightly higher TER at 0.20% but larger AUM and tighter spreads, better for larger lump-sum buys."
+    },
+    "watch": [
+      "Mega-cap AI earnings this week — forward guidance on AI capex and cloud revenue growth is the single biggest swing factor; a guidance cut will hurt Nasdaq more than a beat would help it.",
+      "Iran/US mediation talks — confirmed progress would rapidly unwind the geopolitical risk premium in oil and defense stocks; any further military exchange has the opposite effect.",
+      "Houthi naval blockade threat on Saudi Arabia — if enacted, this is a supply shock far larger than current oil prices reflect; watch Brent as the real-time risk barometer.",
+      "Fed speakers this week — with 10-year yields at 4.59% and oil elevated, any hawkish signal on rate cut delays would pressure rate-sensitive growth stocks hardest."
+    ]
+  },
+  {
+    "date": "2026-07-20",
+    "mood": "Cautiously bullish into a pivotal week — equities are grinding to fresh gains even as oil spikes on Iran/Hormuz risk, with the market's real verdict due Wednesday and Thursday when Alphabet, Tesla, Intel and IBM report",
+    "macro": [
+      "US futures opened firm: S&P 500 +0.63%, Nasdaq +1.02%, Dow +0.23%, while the Russell 2000 slipped 0.42% — large caps leading small caps into earnings season.",
+      "Oil jumped over 2% as Brent crude hit $90.40/barrel on renewed US-Iran tensions; the US Treasury revoked its sanctions waiver on Iranian oil (transactions barred since July 17) and Yemeni forces declared a 'maritime embargo' against Saudi Arabia, putting Strait of Hormuz flows back in focus. The US Strategic Petroleum Reserve is at its lowest level since 1983, leaving little buffer against a further supply shock.",
+      "Gold is catching a safe-haven bid too, up to $4,027/oz, as investors hedge both the geopolitical risk and the Fed's rate path simultaneously.",
+      "This is the heart of Big Tech earnings season: Alphabet and Tesla report Wednesday, Intel and IBM Thursday. Analysts expect Alphabet's revenue growth above 20% with all eyes on AI capex commitments; Tesla is down ~22% from its peak on margin concerns; Intel has rallied over 160% YTD ahead of its print, raising the bar; IBM is still nursing last week's 25% single-session plunge on disappointing prelim results."
+    ],
+    "shortTerm": [
+      {
+        "ticker": "TTE",
+        "name": "TotalEnergies SE",
+        "exchange": "Euronext Paris",
+        "whyNow": "A diversified European oil major that captures today's Brent spike to $90+ directly through upstream production, while downstream and LNG operations cushion the swings a pure driller wouldn't have. Straightforward way to trade the Hormuz risk premium from Bolero without single-well exposure.",
+        "risk": "The entire thesis is a geopolitical risk premium — any de-escalation or ceasefire signal on Iran unwinds the oil spike (and this trade) as fast as it built."
+      },
+      {
+        "ticker": "HO",
+        "name": "Thales SA",
+        "exchange": "Euronext Paris",
+        "whyNow": "European defense and aerospace names carry a structural tailwind as the Iran conflict escalates and NATO members keep lifting defense budgets. Thales adds cybersecurity and avionics diversification on top of the pure defense trade.",
+        "risk": "Defense stocks have already re-rated hard over the past two years — a lot of good news is priced in, and any de-escalation removes the newsflow tailwind, not the underlying earnings."
+      },
+      {
+        "ticker": "NEM",
+        "name": "Newmont Corporation",
+        "exchange": "NYSE",
+        "whyNow": "Gold at $4,027/oz and rising gives the world's largest gold miner direct operating leverage to the metal — miners typically outrun bullion in a sustained safe-haven rally, and this one's catalyst (Iran risk + Fed uncertainty) is live today, not speculative.",
+        "risk": "Miner earnings are levered both ways — a sharp reversal in gold (e.g. quick Iran de-escalation, hawkish Fed pivot) hits NEM harder than the metal itself."
+      }
+    ],
+    "longTerm": [
+      {
+        "ticker": "ACN",
+        "name": "Accenture plc",
+        "exchange": "NYSE",
+        "whyBuy": "Flagged as undervalued by multiple screens this month despite a dominant position in enterprise AI and digital transformation consulting — strong recurring revenue, high free cash flow conversion, and a moat built on client switching costs that's hard to replicate.",
+        "entry": "Consulting names lag the AI story rather than lead it; use any earnings-season-driven pullback in the group as an entry rather than chasing strength."
+      },
+      {
+        "ticker": "ASML",
+        "name": "ASML Holding NV",
+        "exchange": "Euronext Amsterdam",
+        "whyBuy": "The only supplier of EUV lithography machines needed for leading-edge chips — a true monopoly moat on the most durable multi-year theme in markets (AI/semiconductor capex), and it settles in euros on Bolero with zero currency drag for a Belgian investor.",
+        "entry": "Never screens statistically cheap given the quality of the business; build the position in tranches around quarterly capex commentary from TSMC, Intel and Samsung rather than trying to time a single entry."
+      },
+      {
+        "ticker": "UCB",
+        "name": "UCB SA",
+        "exchange": "Euronext Brussels",
+        "whyBuy": "Belgian biopharma with a genuine home-market edge on Bolero — Bimzelx's expanding label across immunology indications and a deep late-stage neurology pipeline give multi-year earnings visibility that's largely decoupled from the AI-capex debate dominating the tape.",
+        "entry": "Euronext Brussels listing, no FX conversion needed. Add on any pipeline-readout disappointment or sector-wide pharma weakness rather than at 52-week highs."
+      },
+      {
+        "ticker": "MU",
+        "name": "Micron Technology",
+        "exchange": "Nasdaq",
+        "whyBuy": "Structurally positioned at the AI memory bottleneck via HBM chips — demand from every major AI accelerator maker keeps growing faster than supply, and the stock's 12-month run reflects a real earnings re-rating, not pure sentiment.",
+        "entry": "Highly volatile group; scale in over several sessions and treat any earnings-season chip-sector selloff (Intel reports Thursday) as an add point rather than a red flag."
+      }
+    ],
+    "etf": {
+      "ticker": "XDWE",
+      "name": "Xtrackers MSCI World Energy UCITS ETF",
+      "exchange": "Xetra / Euronext",
+      "horizon": "Short-term trade",
+      "rationale": "Broad, diversified exposure to global oil & gas majors and services companies — captures today's Hormuz-driven oil spike without betting on which single name benefits most, and stays UCITS-wrapped and Bolero-accessible. A cleaner way to trade the current geopolitical risk premium than picking individual drillers.",
+      "also": "For a long-term core holding once this trade is closed out, the iShares Core S&P 500 UCITS ETF (CSPX) remains the cheapest, most liquid broad-market anchor available on Bolero at a 0.07% expense ratio."
+    },
+    "watch": [
+      "Alphabet and Tesla report Wednesday — Alphabet's AI capex commentary is the single biggest swing factor for the broader tech rally this week; Tesla's margin trajectory and Cybercab progress matter more than the top line.",
+      "Intel and IBM report Thursday — Intel's stock has already priced a strong quarter after its 160%+ YTD run, raising the bar for any beat to matter; IBM needs to stabilise after last week's 25% plunge.",
+      "Strait of Hormuz developments — any further escalation (or a surprise de-escalation) between the US, Iran and Gulf shipping lanes will move oil, gold and the energy trade above faster than any single earnings report this week.",
+      "US Strategic Petroleum Reserve and Fed commentary — with the SPR at its lowest since 1983, there's little policy buffer left against a further oil shock, and a hawkish Fed reaction to oil-driven inflation would hit richly-valued tech hardest."
+    ]
+  }
+]
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+
+<script>
+const hist = JSON.parse(document.getElementById('briefing-history').textContent);
+let cur = 0;
+
+const fmtFull  = d => new Date(d+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+const fmtShort = d => new Date(d+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+const fmtDay   = d => new Date(d+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short'});
+const x = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+const dotSVG = `<svg viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>`;
+
+function render() {
+  document.getElementById('root').innerHTML = buildPage();
+  document.querySelectorAll('.dtab').forEach((el,i) => el.addEventListener('click', () => { cur=i; render(); }));
+}
+
+function buildPage() {
+  const b = hist[cur];
+  if (!b) return `
+    <div class="topbar"></div>
+    <div class="header"><div class="header-inner"><div class="brand"><div class="brand-mark">📈</div><div class="brand-text"><div class="brand-name">Morning Investment Briefing</div><div class="brand-sub">Bolero Belgium · Curated Daily</div></div></div></div></div>
+    <div class="page"><div class="empty"><div class="eicon">📋</div><h2>No briefings yet</h2><p>Your first briefing will appear here tomorrow morning.</p></div></div>`;
+
+  const moodShort = (b.mood||'').split('—')[0].trim();
+  const tabs = hist.map((h,i) => `<div class="dtab${i===cur?' active':''}"><span class="wd">${fmtDay(h.date)}</span>${fmtShort(h.date)}</div>`).join('');
+
+  const macroRows = (b.macro||[]).map(m => `
+    <div class="macro-row">
+      <div class="macro-bullet">${dotSVG}</div>
+      <div class="macro-text">${x(m)}</div>
+    </div>`).join('');
+
+  const stCards = (b.shortTerm||[]).map(p => `
+    <div class="stock-card">
+      <div class="card-bar st"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="card-ticker-wrap">
+            <div class="card-ticker">${x(p.ticker)}</div>
+            <div class="card-company">${x(p.name)}</div>
+          </div>
+          <span class="exch-chip">${x(p.exchange)}</span>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-fields">
+          <div class="card-field"><span class="field-key why">Why now</span><span class="field-val">${x(p.whyNow)}</span></div>
+          <div class="card-field"><span class="field-key risk">Risk</span><span class="field-val">${x(p.risk)}</span></div>
+        </div>
+      </div>
+    </div>`).join('');
+
+  const ltCards = (b.longTerm||[]).map(p => `
+    <div class="stock-card">
+      <div class="card-bar lt"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="card-ticker-wrap">
+            <div class="card-ticker">${x(p.ticker)}</div>
+            <div class="card-company">${x(p.name)}</div>
+          </div>
+          <span class="exch-chip">${x(p.exchange)}</span>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-fields">
+          <div class="card-field"><span class="field-key why">Why buy</span><span class="field-val">${x(p.whyBuy)}</span></div>
+          <div class="card-field"><span class="field-key entry">Entry</span><span class="field-val">${x(p.entry)}</span></div>
+        </div>
+      </div>
+    </div>`).join('');
+
+  const etfHTML = b.etf ? `
+    <div class="etf-card">
+      <div class="etf-bar"></div>
+      <div class="etf-body">
+        <div class="etf-top">
+          <div class="etf-ticker-wrap">
+            <div class="etf-ticker">${x(b.etf.ticker)}</div>
+            <div class="etf-name">${x(b.etf.name)}</div>
+            <div class="etf-exch">${x(b.etf.exchange)}</div>
+          </div>
+          <span class="horizon-chip">${x(b.etf.horizon)}</span>
+        </div>
+        <div class="etf-divider"></div>
+        <div class="etf-rationale">${x(b.etf.rationale)}</div>
+        ${b.etf.also ? `<div class="etf-also">${x(b.etf.also)}</div>` : ''}
+      </div>
+    </div>` : '';
+
+  const watchCards = (b.watch||[]).map((w,i) => `
+    <div class="watch-card">
+      <div class="watch-num">${i+1}</div>
+      <div class="watch-text">${x(w)}</div>
+    </div>`).join('');
+
+  return `
+    <div class="topbar"></div>
+    <div class="header">
+      <div class="header-inner">
+        <div class="brand">
+          <div class="brand-mark">📈</div>
+          <div class="brand-text">
+            <div class="brand-name">Morning Investment Briefing</div>
+            <div class="brand-sub">Bolero Belgium · Curated Daily</div>
+          </div>
+        </div>
+        <div class="header-meta">
+          <div class="header-date">${fmtFull(b.date)}</div>
+          ${moodShort ? `<div class="mood-tag">${x(moodShort)}</div>` : ''}
+        </div>
+      </div>
+      <div class="date-strip">${tabs}</div>
+    </div>
+
+    <div class="page">
+
+      <div class="sec">
+        <div class="sec-head">
+          <div class="sec-icon sky">🌍</div>
+          <span class="sec-label">Macro Snapshot</span>
+          <div class="sec-rule"></div>
+        </div>
+        <div class="macro-wrap">
+          <div class="macro-bar"></div>
+          <div class="macro-body">${macroRows}</div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head">
+          <div class="sec-icon amber">🔥</div>
+          <span class="sec-label">Short-Term Opportunities</span>
+          <div class="sec-rule"></div>
+        </div>
+        <div class="stock-grid">${stCards || '<p style="color:var(--muted);font-size:13px">No short-term picks today.</p>'}</div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head">
+          <div class="sec-icon green">📈</div>
+          <span class="sec-label">Long-Term Watchlist</span>
+          <div class="sec-rule"></div>
+        </div>
+        <div class="stock-grid">${ltCards || '<p style="color:var(--muted);font-size:13px">No long-term picks today.</p>'}</div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head">
+          <div class="sec-icon violet">💡</div>
+          <span class="sec-label">ETF of the Day</span>
+          <div class="sec-rule"></div>
+        </div>
+        ${etfHTML || '<p style="color:var(--muted);font-size:13px">No ETF pick today.</p>'}
+      </div>
+
+      <div class="sec">
+        <div class="sec-head">
+          <div class="sec-icon rose">⚠️</div>
+          <span class="sec-label">What to Watch Today</span>
+          <div class="sec-rule"></div>
+        </div>
+        <div class="watch-list">${watchCards}</div>
+      </div>
+
+      ${b.mood ? `<div class="mood-footer"><strong>Overall mood:</strong> ${x(b.mood)}</div>` : ''}
+
+      <div class="disclaimer">
+        For informational purposes only — not financial advice. Always conduct your own research before making investment decisions.<br>
+        Full briefing history is embedded in this page and accumulates each morning.
+      </div>
+
+    </div>`;
+}
+
+document.addEventListener('DOMContentLoaded', render);
+</script>
+
+<div id="root"></div>
+</body>
+</html>
